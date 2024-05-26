@@ -1,0 +1,93 @@
+:root {
+  --b1: #1E3448;
+  --b2: #305373;
+  --b3: #40658C;
+  --b3-hover: #AB204A;
+  --b4: #5C86B4;
+  --b5: #72B4F2;
+  --b6: #A7CCED;
+  --b7: #F1F5F9;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 18px;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+  font-family: roboto, sans-serif;
+  color: var(--b1);
+  background-color: var(--b1);
+}
+
+h1 {
+  margin-bottom: 3rem;
+  color: var(--b6);
+}
+
+#calculator-container {
+  border: 1px solid var(--b2);
+  display: grid;
+  grid-template-areas:
+    "com com com com"
+    "ac par1 par2 plus"
+    "b1 b2 b3 minus"
+    "b4 b5 b6 times"
+    "b7 b8 b9 divide"
+    "b0 b0 float equal";
+  height: 450px;
+  width: 350px;
+  font-weight: 500;
+}
+
+.button {
+  border: 1px solid var(--b2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#command-line {
+  grid-area: com;
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  padding-right: 1rem;
+  border: 1px solid var(--b2);
+  background-color: var(--b3);
+  color: var(--b7);
+  min-height: 30px;
+}
+
+#button-0 {
+ grid-area: b0;
+}
+
+.operator, .equals {
+  background-color: var(--b5);
+}
+
+.number, #dot-button {
+  background-color: var(--b6);
+}
+
+.top {
+  background-color: var(--b4);
+  color: var(--b7);
+}
+
+.number:hover, .operator:hover, .equals:hover, .top:hover, #dot-button:hover {
+  background-color: var(--b3-hover);
+  color: var(--b7);
+  cursor: pointer;
+}
