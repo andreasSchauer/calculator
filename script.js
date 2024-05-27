@@ -25,8 +25,11 @@ const replaceFormula = (string, regex) => {
 
 const calculate = (input) => {
   let solution = input;
-  const plusMinusRegex = /((?:(?<!=\d)\-)?\d+\.?\d*)(\+|\-)((?:(?<!=\d)\-)?\d+\.?\d*)/;
-  const multiplyDivideRegex = /((?:(?<!=\d)\-)?\d+\.?\d*)(\*|\/)((?:(?<!=\d)\-)?\d+\.?\d*)/;
+  
+  // accounts for negative values as well as decimal numbers
+  const number = `((?:(?<!=\\d)\\-)?\\d+\\.?\\d*)`;
+  const plusMinusRegex = new RegExp(number + `(\\+|\\-)` + number);
+  const multiplyDivideRegex = new RegExp(number + `(\\*|\\/)` + number);
   const parenthesesRegex = /\(([\d\.\+\-\*\/]+)\)/; 
   
   while(solution.match(parenthesesRegex)) {
@@ -58,7 +61,7 @@ const findDecimalPlaces = (input) => {
 }
 
 const findIntegerDigits = (input) => {
-  const integer = Math.floor(Number(input));
+  const integer = Math.floor(input);
   return integer === 0 ? 0 : String(integer).length;
 }
 
@@ -73,10 +76,10 @@ window.onload = () => {
   for(let button of operatorButtons) {
     button.addEventListener("click", () => {
       const operatorAtEnd = /[\.\+\-\*\/]$/.test(commandLine.textContent);
-      const isMultiplyOrDivide = /\*|\//.test(button.textContent);
+      const isNotMinus = /[\+\*\/]/.test(button.textContent);
       const openParenthesesAtEnd = /\($/.test(commandLine.textContent);
       
-      if(openParenthesesAtEnd && isMultiplyOrDivide) {
+      if(openParenthesesAtEnd && isNotMinus) {
         return
       }
       
@@ -91,10 +94,10 @@ window.onload = () => {
 
 
 parenthesesOpenButton.addEventListener("click", () => {
-  const unclosedParentheses = /\([\d\.\+\-\*\/]*$/.test(commandLine.textContent);
+  const alreadyOpen = /\([\d\.\+\-\*\/]*$/.test(commandLine.textContent);
   const noOperatorAtEnd = /[\d\.\)]$/.test(commandLine.textContent);
 
-  if(unclosedParentheses || noOperatorAtEnd) {
+  if(alreadyOpen || noOperatorAtEnd) {
     return
   }
   
@@ -102,10 +105,10 @@ parenthesesOpenButton.addEventListener("click", () => {
 })
 
 parenthesesCloseButton.addEventListener("click", () => {
-  const unclosedParentheses = /\([\d\.\+\-\*\/]+$/.test(commandLine.textContent);
+  const alreadyClosed = !/\([\d\.\+\-\*\/]+$/.test(commandLine.textContent);
   const noDigitAtEnd = !/\d$/.test(commandLine.textContent);
   
-  if(!unclosedParentheses || noDigitAtEnd) {
+  if(alreadyClosed || noDigitAtEnd) {
     return
   }
   
@@ -114,9 +117,9 @@ parenthesesCloseButton.addEventListener("click", () => {
 
 dotButton.addEventListener("click", () => {
   const startsWithDigit = /^\d+$/.test(commandLine.textContent);
-  const noCurrentFloat = /([\+\-\*\/\(\)]\d+)$/.test(commandLine.textContent);
+  const noFloatingNum = /([\+\-\*\/\(\)]\d+)$/.test(commandLine.textContent);
   
-  if(startsWithDigit || noCurrentFloat) {
+  if(startsWithDigit || noFloatingNum) {
     commandLine.textContent += "."
   }
 })
@@ -124,18 +127,26 @@ dotButton.addEventListener("click", () => {
 
 equalButton.addEventListener ("click", () => {
   const input = commandLine.textContent;
-  const result = calculate(input);
+  const endsWithDot = /\.$/.test(input);
+  const result = Number(calculate(input));
   
-  if (Number(result) === Math.floor(result)) {
+  if(!result || endsWithDot) {
+    commandLine.textContent = "Invalid Input";
+    setTimeout(() => {
+      commandLine.textContent = "";
+    }, 1500);
+    return
+  }
+  
+  if(Number.isInteger(result)) {
     commandLine.textContent = result;
     return
   }
   
   const digitsAmount = findIntegerDigits(result) + findDecimalPlaces(input);
-  commandLine.textContent = Number(result).toPrecision(digitsAmount);
+  commandLine.textContent = result.toPrecision(digitsAmount);
 })
 
 clearButton.addEventListener("click", () => {
   commandLine.innerHTML = "";
 })
-
